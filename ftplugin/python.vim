@@ -1,40 +1,80 @@
-"add/remove comment for one line
-map <silent>00 ^@='I# <C-V><Esc>'<CR>
-map <silent><Leader>00 :s/# //<CR>:noh<CR>
-"add/remove comment for whole block
-vmap <silent>99 :s/^/# /<CR>:noh<CR>
-vmap <silent><Leader>99 :s/^# //<CR>:noh<CR>
-"adds colon after functions
-inoremap ;; <right>:<CR>
+" Commenting blocks of code.
+noremap <buffer> <silent> <leader>00 :<C-B>silent <C-E>s/^/<C-R>=escape('#','\/')<CR>/<CR>:nohlsearch<CR>
+" noremap <buffer> <silent> ,00 :<C-B>silent <C-E>s/^\V<C-R>=escape('//','\/')<CR>//e<CR>:nohlsearch<CR>
+"
+"guide lines
+nmap <leader>cl :set cursorcolumn!<Bar>set cursorline!<CR>
+
+"insert comment
+inoremap // #<SPACE>
+
+let s:comment_map = {
+    \   "python": '#'
+    \ }
+
+function! ToggleComment()
+    if has_key(s:comment_map, &filetype)
+        let comment_leader = s:comment_map[&filetype]
+        if getline('.') =~ "^\\s*" . comment_leader . " "
+            " Uncomment the line
+            execute "silent s/^\\(\\s*\\)" . comment_leader . " /\\1/"
+        else
+            if getline('.') =~ "^\\s*" . comment_leader
+                " Uncomment the line
+                execute "silent s/^\\(\\s*\\)" . comment_leader . "/\\1/"
+            else
+                " Comment the line
+                execute "silent s/^\\(\\s*\\)/\\1" . comment_leader . " /"
+            end
+        end
+    else
+        echo "No comment leader found for filetype"
+    end
+endfunction
+
+
+nnoremap <buffer> <silent> 00 :call ToggleComment()<cr>
+vnoremap <buffer> <silent> 00 :call ToggleComment()<cr>
 
 "diable popup window
 set completeopt-=preview
 
+"indentation
+set ts=8 et sw=4 sts=4
+set autoindent
+
+"folding"
+" setlocal foldmethod=indent
+" set foldnestmax=1
+"---word completions----
+inoremap <expr> <C-y> pumvisible() ? "\<C-y>" : "\<CR>"
+inoremap <expr> <C-j> pumvisible() ? "\<C-n>" : "\<Down>"
+inoremap <expr> <C-k> pumvisible() ? "\<C-p>" : "\<Up>"
+
 "open ftplugin
-nmap <leader>ef :tabnew /home/cos/.vim/ftplugin/python.vim<CR>
+nmap <leader>ef :tabnew $HOME/.vim/ftplugin/python.vim<CR>
 
 
 "---------------------------------------------------------------------------------------------
 "------------------------------------------------------Pymode----------------------------------
 "---------------------------------------------------------------------------------------------
-nnoremap <Tab><Tab> :PymodeLintAuto<CR>
 
 
 "---------------------------------------------------------------------------------------------
 "------------------------------------------------------vimux----------------------------------
 "---------------------------------------------------------------------------------------------
-" Prompt for a command to run
-map <Leader>vp :VimuxPromptCommand<CR>
+" Prompt to run current file
+map <Leader>vp :VimuxPromptCommand<CR>python3 <C-R>=expand("%:t")<CR><CR>
 "Run last command executed by VimuxRunCommand
 map <Leader>ll :VimuxRunLastCommand<CR><bar><C-w>j
 " Inspect runner pane
 map <Leader>vi :VimuxInspectRunner<CR>2<C-w>j
 " Zoom the tmux runner pane
-map <Leader>vz :VimuxZoomRunner<CR>
+map <Leader>vv :VimuxZoomRunner<CR>
 
 "---------------------------------------------------------------------------------------------
 "------------------------------------------------------Snippets----------------------------------
 "---------------------------------------------------------------------------------------------
-"open tex snippets file
-nmap <leader>es :tabnew /home/cos/.vim/plugged/vim-snippets/snippets/python.snippets<CR>
+"open python snippets file
+nmap <leader>es :tabnew $HOME/.vim/plugged/vim-snippets/snippets/python.snippets<CR>
 
