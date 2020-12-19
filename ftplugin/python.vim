@@ -5,8 +5,13 @@ noremap <buffer> <silent> <leader>00 :<C-B>silent <C-E>s/^/<C-R>=escape('#','\/'
 "guide lines
 nmap <leader>cl :set cursorcolumn!<Bar>set cursorline!<CR>
 
+
 "insert comment
-inoremap // #<SPACE>
+inoremap <buffer> // #<SPACE>
+
+"insert block comments (has white space at end)
+nnoremap <Leader>cb o#/* Block Comment<CR>#<CR>#*/<ESC>kA 
+inoremap ,cb #/* Block Comment<CR>#<CR>#*/<ESC>kA 
 
 let s:comment_map = {
     \   "python": '#'
@@ -46,25 +51,36 @@ set autoindent
 "folding"
 " setlocal foldmethod=indent
 " set foldnestmax=1
+set foldmethod=marker
+set foldmarker=#/*,#*/
+
 "---word completions----
 inoremap <expr> <C-y> pumvisible() ? "\<C-y>" : "\<CR>"
 inoremap <expr> <C-j> pumvisible() ? "\<C-n>" : "\<Down>"
 inoremap <expr> <C-k> pumvisible() ? "\<C-p>" : "\<Up>"
 
 "open ftplugin
-nmap <leader>ef :tabnew $HOME/.vim/ftplugin/python.vim<CR>
+nmap <buffer> <leader>ef :tabnew $HOME/.vim/ftplugin/python.vim<CR>
 
 
 "---------------------------------------------------------------------------------------------
 "------------------------------------------------------Pymode----------------------------------
 "---------------------------------------------------------------------------------------------
-
-
+" function! Big()
+"     :PymodeLintAuto
+"     :echo 'ayyy'
+" "     :%s/# \/\*/#\/*/g
+" "     :%s/# \*\//#\*\/g
+" endfunction
+" command! Pl call Big()
+" cabbrev pl Pl
+nnoremap <silent> <Leader>pl :PymodeLintAuto<CR>:%s/# \/\*/#\/*/<CR>:%s/# \*\//#\*\/<CR>
+" # */
 "---------------------------------------------------------------------------------------------
 "------------------------------------------------------vimux----------------------------------
 "---------------------------------------------------------------------------------------------
 " Prompt to run current file
-map <Leader>vp :VimuxPromptCommand<CR>python3 <C-R>=expand("%:t")<CR><CR>
+map <Leader>vp :VimuxPromptCommand<CR>python3 <C-R>=expand("%:p")<CR><CR>
 "Run last command executed by VimuxRunCommand
 map <Leader>ll :VimuxRunLastCommand<CR><bar><C-w>j
 " Inspect runner pane
