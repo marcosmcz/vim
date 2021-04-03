@@ -1,1 +1,1 @@
-au BufNewFile,BufRead .r,.R  setf r
+au BufNewFile,BufRead .r,.R,.Rnw  setf r
