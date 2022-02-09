@@ -1,0 +1,215 @@
+let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
+argglobal
+noremap <buffer> <silent> ra :PymodeRopeAutoImport
+noremap <buffer> <silent> r1p :call pymode#rope#module_to_package()
+noremap <buffer> <silent> rnc :call pymode#rope#generate_class()
+noremap <buffer> <silent> rnp :call pymode#rope#generate_package()
+noremap <buffer> <silent> rnf :call pymode#rope#generate_function()
+noremap <buffer> <silent> ru :call pymode#rope#use_function()
+noremap <buffer> <silent> rs :call pymode#rope#signature()
+noremap <buffer> <silent> rv :call pymode#rope#move()
+noremap <buffer> <silent> ri :call pymode#rope#inline()
+vnoremap <buffer> <silent> rl :call pymode#rope#extract_variable()
+vnoremap <buffer> <silent> rm :call pymode#rope#extract_method()
+noremap <buffer> <silent> r1r :call pymode#rope#rename_module()
+noremap <buffer> <silent> rr :call pymode#rope#rename()
+noremap <buffer> <silent> ro :call pymode#rope#organize_imports()
+noremap <buffer> <silent> f :call pymode#rope#find_it()
+noremap <buffer> <silent> d :call pymode#rope#show_doc()
+let s:cpo_save=&cpo
+set cpo&vim
+nmap <buffer>  hp <Plug>(GitGutterPreviewHunk)
+nmap <buffer>  hu <Plug>(GitGutterUndoHunk)
+nmap <buffer>  hs <Plug>(GitGutterStageHunk)
+xmap <buffer>  hs <Plug>(GitGutterStageHunk)
+noremap <buffer> <silent>  gf :call pymode#rope#goto_definition()
+nnoremap <buffer> <silent>  b :call pymode#breakpoint#operate(line('.'))
+vnoremap <buffer> <silent>  r :PymodeRun
+nnoremap <buffer> <silent>  r :PymodeRun
+nmap <buffer>  ef :tabnew $HOME/.vim/ftplugin/python.vim
+noremap <buffer> <silent>  00 :silent s/^/=escape('#','\/')/:nohlsearch
+vnoremap <buffer> <silent> 44 :call ToggleComment()
+nnoremap <buffer> <silent> 44 :call ToggleComment()
+onoremap <buffer> C :call pymode#motion#select_c('^\s*class\s', 0)
+vnoremap <buffer> <silent> K :call pymode#doc#show(@*)
+nnoremap <buffer> <silent> K :call pymode#doc#find()
+onoremap <buffer> M :call pymode#motion#select('^\s*\(async\s\+\)\=@', '^\s*\(async\s\+\)\=def\s', 0)
+vnoremap <buffer> [M :call pymode#motion#vmove('^\s*\(async\s\+\)\=def\s', 'b')
+vnoremap <buffer> [[ :call pymode#motion#vmove('^\(class\|\%(async\s\+\)\=def\)\s', 'b')
+onoremap <buffer> [M :call pymode#motion#move('^\s*\(async\s\+\)\=def\s', 'b')
+onoremap <buffer> [[ :call pymode#motion#move('^\(class\|\%(async\s\+\)\=def\)\s', 'b')
+nnoremap <buffer> [M :call pymode#motion#move('^\s*\(async\s\+\)\=def\s', 'b')
+nnoremap <buffer> [[ :call pymode#motion#move('^\(class\|\%(async\s\+\)\=def\)\s', 'b')
+onoremap <buffer> [C :call pymode#motion#move('^\(class\|\%(async\s\+\)\=def\)\s', 'b')
+nnoremap <buffer> [C :call pymode#motion#move('^\(class\|\%(async\s\+\)\=def\)\s', 'b')
+vnoremap <buffer> ]M :call pymode#motion#vmove('^\s*\(async\s\+\)\=def\s', '')
+vnoremap <buffer> ]] :call pymode#motion#vmove('^\(class\|\%(async\s\+\)\=def\)\s', '')
+onoremap <buffer> ]M :call pymode#motion#move('^\s*\(async\s\+\)\=def\s', '')
+onoremap <buffer> ]] :call pymode#motion#move('^\(class\|\%(async\s\+\)\=def\)\s', '')
+nnoremap <buffer> ]M :call pymode#motion#move('^\s*\(async\s\+\)\=def\s', '')
+nnoremap <buffer> ]] :call pymode#motion#move('^\(class\|\%(async\s\+\)\=def\)\s', '')
+onoremap <buffer> ]C :call pymode#motion#move('^\(class\|\%(async\s\+\)\=def\)\s', '')
+nnoremap <buffer> ]C :call pymode#motion#move('^\(class\|\%(async\s\+\)\=def\)\s', '')
+xmap <buffer> ac <Plug>(GitGutterTextObjectOuterVisual)
+omap <buffer> ac <Plug>(GitGutterTextObjectOuterPending)
+vnoremap <buffer> aM :call pymode#motion#select('^\s*\(async\s\+\)\=@', '^\s*\(async\s\+\)\=def\s', 0)
+onoremap <buffer> aM :call pymode#motion#select('^\s*\(async\s\+\)\=@', '^\s*\(async\s\+\)\=def\s', 0)
+vnoremap <buffer> aC :call pymode#motion#select_c('^\s*class\s', 0)
+onoremap <buffer> aC :call pymode#motion#select_c('^\s*class\s', 0)
+xmap <buffer> ic <Plug>(GitGutterTextObjectInnerVisual)
+omap <buffer> ic <Plug>(GitGutterTextObjectInnerPending)
+vnoremap <buffer> iM :call pymode#motion#select('^\s*\(async\s\+\)\=@', '^\s*\(async\s\+\)\=def\s', 1)
+onoremap <buffer> iM :call pymode#motion#select('^\s*\(async\s\+\)\=@', '^\s*\(async\s\+\)\=def\s', 1)
+vnoremap <buffer> iC :call pymode#motion#select_c('^\s*class\s', 1)
+onoremap <buffer> iC :call pymode#motion#select_c('^\s*class\s', 1)
+noremap <buffer> <silent> <C-C>ra :PymodeRopeAutoImport
+noremap <buffer> <silent> <C-C>r1p :call pymode#rope#module_to_package()
+noremap <buffer> <silent> <C-C>rnc :call pymode#rope#generate_class()
+noremap <buffer> <silent> <C-C>rnp :call pymode#rope#generate_package()
+noremap <buffer> <silent> <C-C>rnf :call pymode#rope#generate_function()
+noremap <buffer> <silent> <C-C>ru :call pymode#rope#use_function()
+noremap <buffer> <silent> <C-C>rs :call pymode#rope#signature()
+noremap <buffer> <silent> <C-C>rv :call pymode#rope#move()
+noremap <buffer> <silent> <C-C>ri :call pymode#rope#inline()
+vnoremap <buffer> <silent> <C-C>rl :call pymode#rope#extract_variable()
+vnoremap <buffer> <silent> <C-C>rm :call pymode#rope#extract_method()
+noremap <buffer> <silent> <C-C>r1r :call pymode#rope#rename_module()
+noremap <buffer> <silent> <C-C>rr :call pymode#rope#rename()
+noremap <buffer> <silent> <C-C>ro :call pymode#rope#organize_imports()
+noremap <buffer> <silent> <C-C>f :call pymode#rope#find_it()
+noremap <buffer> <silent> <C-C>d :call pymode#rope#show_doc()
+inoremap <buffer> // # 
+let &cpo=s:cpo_save
+unlet s:cpo_save
+setlocal keymap=
+setlocal noarabic
+setlocal autoindent
+setlocal backupcopy=
+setlocal balloonexpr=
+setlocal nobinary
+setlocal nobreakindent
+setlocal breakindentopt=
+setlocal bufhidden=
+setlocal buflisted
+setlocal buftype=
+setlocal nocindent
+setlocal cinkeys=0{,0},0),0],:,!^F,o,O,e
+setlocal cinoptions=
+setlocal cinwords=if,else,while,do,for,switch
+setlocal colorcolumn=
+setlocal comments=b:#,fb:-
+setlocal commentstring=#\ %s
+setlocal complete=.,w,b,u,i,t
+setlocal concealcursor=
+setlocal conceallevel=0
+setlocal completefunc=
+setlocal nocopyindent
+setlocal cryptmethod=
+setlocal nocursorbind
+setlocal nocursorcolumn
+setlocal nocursorline
+setlocal cursorlineopt=both
+setlocal define=^\\s*\\(def\\|class\\)
+setlocal dictionary=
+setlocal nodiff
+setlocal equalprg=
+setlocal errorformat=
+setlocal expandtab
+if &filetype != 'python'
+setlocal filetype=python
+endif
+setlocal fixendofline
+setlocal foldcolumn=0
+setlocal foldenable
+setlocal foldexpr=0
+setlocal foldignore=#
+setlocal foldlevel=0
+setlocal foldmarker=#/*,#*/
+setlocal foldmethod=marker
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldtext=foldtext()
+setlocal formatexpr=
+setlocal formatoptions=cq
+setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
+setlocal formatprg=
+setlocal grepprg=
+setlocal iminsert=0
+setlocal imsearch=-1
+setlocal include=^\\s*\\(from\\|import\\)
+setlocal includeexpr=substitute(substitute(substitute(v:fname,b:grandparent_match,b:grandparent_sub,''),b:parent_match,b:parent_sub,''),b:child_match,b:child_sub,'g')
+setlocal indentexpr=pymode#indent#get_indent(v:lnum)
+setlocal indentkeys=!^F,o,O,<:>,0),0],0},=elif,=except
+setlocal noinfercase
+setlocal iskeyword=@,48-57,_,192-255
+setlocal keywordprg=python3\ -m\ pydoc
+setlocal nolinebreak
+setlocal nolisp
+setlocal lispwords=
+setlocal nolist
+setlocal makeencoding=
+setlocal makeprg=
+setlocal matchpairs=(:),{:},[:]
+setlocal modeline
+setlocal modifiable
+setlocal nrformats=bin,octal,hex
+setlocal number
+setlocal numberwidth=4
+setlocal omnifunc=python3complete#Complete
+setlocal path=
+setlocal nopreserveindent
+setlocal nopreviewwindow
+setlocal quoteescape=\\
+setlocal noreadonly
+setlocal relativenumber
+setlocal norightleft
+setlocal rightleftcmd=search
+setlocal noscrollbind
+setlocal scrolloff=-1
+setlocal shiftwidth=4
+setlocal noshortname
+setlocal showbreak=
+setlocal sidescrolloff=-1
+setlocal signcolumn=auto
+setlocal nosmartindent
+setlocal softtabstop=4
+setlocal nospell
+setlocal spellcapcheck=[.?!]\\_[\\])'\"\	\ ]\\+
+setlocal spellfile=
+setlocal spelllang=en
+setlocal spelloptions=
+setlocal statusline=%!airline#statusline(1)
+setlocal suffixesadd=.py
+setlocal swapfile
+setlocal synmaxcol=3000
+if &syntax != 'python'
+setlocal syntax=python
+endif
+setlocal tabstop=4
+setlocal tagcase=
+setlocal tagfunc=
+setlocal tags=
+setlocal termwinkey=
+setlocal termwinscroll=10000
+setlocal termwinsize=
+setlocal textwidth=79
+setlocal thesaurus=
+setlocal undofile
+setlocal undolevels=-123456
+setlocal varsofttabstop=
+setlocal vartabstop=
+setlocal wincolor=
+setlocal nowinfixheight
+setlocal nowinfixwidth
+setlocal nowrap
+setlocal wrapmargin=0
+let s:l = 42 - ((39 * winheight(0) + 37) / 74)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+42
+normal! 024|
+let &so = s:so_save | let &siso = s:siso_save
+nohlsearch
+doautoall SessionLoadPost
+" vim: set ft=vim :

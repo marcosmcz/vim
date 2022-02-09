@@ -1,15 +1,13 @@
 """"""""""""""""""""""""
 "  Commenting "
 """"""""""""""""""""""""
-" Commenting blocks of code.
- noremap <buffer> <silent> <leader>00 :<C-B>silent <C-E>s/^/<C-R>=escape('//','\/')<CR>/<CR>:nohlsearch<CR>
-" noremap <buffer> <silent> ,00 :<C-B>silent <C-E>s/^\V<C-R>=escape('//','\/')<CR>//e<CR>:nohlsearch<CR>
+inoremap <buffer> ** {/*<SPACE><SPACE><SPACE>*/}<Left><Left><Left><Left>
 
 let s:comment_map = {
-    \   "javascript": '\/\/'
+    \   "typescriptreact": '\/\/'
     \ }
 
-function! ToggleComment()
+function! TSToggleComment()
     if has_key(s:comment_map, &filetype)
         let comment_leader = s:comment_map[&filetype]
         if getline('.') =~ "^\\s*" . comment_leader . " "
@@ -29,20 +27,64 @@ function! ToggleComment()
     end
 endfunction
 
-nnoremap <buffer> <silent> 44 :call ToggleComment()<cr>
-vnoremap <buffer> <silent> 44 :call ToggleComment()<cr>
+nnoremap <buffer> <silent> 44 :call TSToggleComment()<cr>
+vnoremap <buffer> <silent> 44 :call TSToggleComment()<cr>
+
+" autocmd FileType typescriptreact setlocal commentstring={/*\ %s\ */}
+" let g:StartComment="{/\* "
+" let g:EndComment="\ */}"
+let StartComment="{\\/\\*" | let EndComment="\\*\\/}"
+
+function! JSXCommenting()
+	if getline('.') =~ "^\\s*" . g:StartComment . " "
+		" Uncomment the line
+		execute "silent s/^\\(\\s*\\)" . g:StartComment . " /\\1/"
+		execute "silent s@ " . g:EndComment . "$@@g"
+	else
+		if getline('.') =~ "^\\s*" . g:StartComment
+			" Uncomment the line
+			execute "silent s/^\\(\\s*\\)" . g:StartComment . " /\\1/"
+			execute "silent s@ " . g:EndComment . "$@@g"
+		else
+			" Comment the line
+			execute "silent s/^\\(\\s*\\)/\\1" . g:StartComment . " /"
+			execute "silent s/$/ " . g:EndComment . "/g"
+		end
+	end
+endfunction
+
+noremap <buffer> <silent> 33 :call JSXCommenting()<CR>
+
+" nnoremap <buffer> <silent> 44 :call TSToggleComment()<cr>
+" vnoremap <buffer> <silent> 44 :call TSToggleComment()<cr>
 
 """"""""""""""""""""""""
 "  Folding "
 """"""""""""""""""""""""
-"set folding
+function! JSFolds()
+  let thisline = getline(v:lnum)
+  if thisline =~? '\v^\s*$'
+    return '-1'
+  endif
+
+  if thisline =~ '^import.*$'
+    return 1
+  else
+    return indent(v:lnum) / &shiftwidth
+  endif
+endfunction
+
+"set folding for files longer than 50 LOC
 " autocmd! BufReadPost * :if line('$') > 50 | set foldmethod=indent | endif
 " if line('$') > 50
 "    set foldmethod=indent
 " endif
-" set foldlevelstart = 0
-" set foldnestmax=2
+setlocal foldmethod=syntax
+" set foldcolumn=1
+setlocal foldnestmax=2
 " let javaScript_fold=1 
+setlocal foldlevel=99
+" setlocal foldexpr=JSFolds()
 
 
 """"""""""""""""""""""""
@@ -113,48 +155,12 @@ nnoremap <leader>cm :call ToggleCenterMode()<cr>
 nnoremap <silent> <buffer> <leader>sc :setlocal spell! spelllang=en_us<cr>
 
 """"""""""""""""""""""""
-"  Vimux "
-""""""""""""""""""""""""
-
-function! OriginalRunCommand(commandType)
-	let l:simple_command = "node ".expand("%:p")
-	if a:commandType == 'simple'
-		let g:original_command = l:simple_command
-	else
-		call inputsave()
-			let arguments = input('Insert args seperated by space: ')
-			let g:original_command = l:simple_command . " data/" .getline(2)." ".arguments 
-		call inputrestore()
-		" could also modify this to take in user input
-	endif
-	call VimuxRunCommand(g:original_command)
-endfunction
-
-function! RunLastCommand()
-	let l:pattern = 'import ipdb;ipdb.set_trace()'
-	let l:simple_command = "node ".expand("%:p")
-    if search(l:pattern,'nw') " if debugger in file
- 		call VimuxRunCommand("q")
-    endif
-	if exists("g:original_command")
-		call VimuxRunCommand(g:original_command)
-	else
-		call VimuxRunCommand(l:simple_command)
-	endif
-endfunction
-
-nmap <buffer> <Leader>ll :w<CR>:call RunLastCommand()<CR>
-" Inspect runner pane
-" nmap <buffer><Leader>vi :VimuxInspectRunner<CR>2<C-w>j
-" Zoom the tmux runner pane
-" nmap <buffer><Leader>vv :VimuxZoomRunner<CR>
-
-""""""""""""""""""""""""
 "  Debugging "
 """"""""""""""""""""""""
 "insert debugger statement
 let s:debug_map = {
-    \   "javascript": 'debugger;'
+    \   "typescript": 'debugger;',
+    \   "typescriptreact": 'debugger;'
     \ }
 
 function! ToggleDebugging(lnum)
@@ -176,7 +182,7 @@ function! ToggleDebugging(lnum)
     endif
 endfunction
 
-nnoremap <buffer> <silent> <leader>b :w<CR>:call ToggleDebugging(line('.'))<CR>
+nnoremap <buffer> <silent> <localleader>b :w<CR>:call ToggleDebugging(line('.'))<CR>
 
 "guide lines
 nmap <buffer> <silent><leader>cl :set cursorcolumn!<Bar>set cursorline!<CR>
@@ -188,20 +194,16 @@ nmap <buffer> <silent><leader>cl :set cursorcolumn!<Bar>set cursorline!<CR>
 """"""""""""""""""""""""
 "  Snippets "
 """"""""""""""""""""""""
-UltiSnipsAddFiletypes javascript-ember
 "open js snippets file
-nmap <leader>es :tabnew $HOME/.vim/plugged/vim-snippets/snippets/javascript/javascript.snippets<CR>
-"open js ember snippts file
-nmap <leader>ese :tabnew $HOME/.vim/plugged/vim-snippets/UltiSnips/javascript-ember.snippets<CR>
+nmap <leader>es :tabnew $HOME/.vim/plugged/vim-snippets/UltiSnips/typescriptreact.snippets<CR>
+nmap <leader>ej :tabnew $HOME/.vim/plugged/vim-snippets/snippets/javascript/javascript.snippets<CR>
 
 """"""""""""""""""""""""
-"  Misc "
+"  Ftplugin open "
 """"""""""""""""""""""""
 "open ftphlugin
-nmap <leader>ef :tabnew $HOME/.vim/ftplugin/javascript.vim<CR>
+nmap <leader>ef :tabnew $HOME/.vim/ftplugin/typescriptreact.vim<CR>
 
-
-" nmap } :<C-u>call search('^\s*$\\|\%$', 'W')<CR>
 """"""""""""""""""""""""
 "  COC "
 """"""""""""""""""""""""

@@ -1,31 +1,29 @@
 """"""""""""""""""""""""
 "  Commenting "
-""""""""""""""""""""""""
-noremap <buffer> <silent> <leader>00 :<C-B>silent <C-E>s/^/<C-R>=escape('//','\/')<CR>/<CR>:nohlsearch<CR>
-let s:comment_map = { "css": '\/\/'}
+let StartComment="\\/\\*" | let EndComment="\\*\\/"
 
-function! ToggleComment()
-    if has_key(s:comment_map, &filetype)
-        let comment_leader = s:comment_map[&filetype]
-        if getline('.') =~ "^\\s*" . comment_leader . " "
-            " Uncomment the line
-            execute "silent s/^\\(\\s*\\)" . comment_leader . " /\\1/"
-        else
-            if getline('.') =~ "^\\s*" . comment_leader
-                " Uncomment the line
-                execute "silent s/^\\(\\s*\\)" . comment_leader . "/\\1/"
-            else
-                " Comment the line
-                execute "silent s/^\\(\\s*\\)/\\1" . comment_leader . " /"
-            end
-        end
-    else
-        echo "No comment leader found for filetype"
-    end
+function! CSSCommenting()
+	if getline('.') =~ "^\\s*" . g:StartComment . " "
+		" Uncomment the line
+		execute "silent s/^\\(\\s*\\)" . g:StartComment . " /\\1/"
+		execute "silent s@ " . g:EndComment . "$@@g"
+	else
+		if getline('.') =~ "^\\s*" . g:StartComment
+			" Uncomment the line
+			execute "silent s/^\\(\\s*\\)" . g:StartComment . " /\\1/"
+			execute "silent s@ " . g:EndComment . "$@@g"
+		else
+			" Comment the line
+			execute "silent s/^\\(\\s*\\)/\\1" . g:StartComment . " /"
+			execute "silent s/$/ " . g:EndComment . "/g"
+		end
+	end
 endfunction
 
-nnoremap <buffer> <silent> 44 :call ToggleComment()<cr>
-vnoremap <buffer> <silent> 44 :call ToggleComment()<cr>
+noremap <buffer> <silent> 44 :call CSSCommenting()<CR>
+
+" insert comment
+inoremap <buffer> // /*   */<ESC>3hi
 
 
 """"""""""""""""""""""""
@@ -80,4 +78,4 @@ augroup END
 "  Misc "
 """"""""""""""""""""""""
 "open ftplugin
-nmap <buffer> <leader>ef :tabnew $HOME/.vim/ftplugin/scss.vim<CR>
+nmap <buffer> <leader>ef :tabnew $HOME/.vim/ftplugin/css.vim<CR>
